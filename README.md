@@ -16,3 +16,111 @@ Another bug I ran into was that `grab_trimmed_file_lines` would, instead of retu
     tar -xzf lab1.tar.gz
     cd 542lab1
     cargo build
+    cd text/hamlet_correct
+    cargo run -- hamlet_ii_2_config.txt
+
+
+# Testing The program
+
+The `text` directory contains example text, the given hamlet excerpts, which have various changes made to test the program.
+`hamlet_correct` contains the sample excerpts and config file.
+`hamlet_config` contains various unusual config files
+`hamlet_lines` contains part files with unusual formats.
+
+## Testing the Command Line Interface
+
+    cd text/hamlet_correct
+
+Tests behavior when run without any config filename given
+
+    cargo run 
+Expected: usage message
+
+Tests behavior when given normal config file
+
+    cargo run -- hamlet_ii_2_config.txt
+Expected: Play script
+
+Tests behavior when given with an option that is not 'whinge'
+
+    cargo run -- hamlet_ii_2_config.txt aaaa
+Expected: usage message
+
+Tests behavior when given a normal config file that does not produce any warnings 
+
+    cargo run -- hamlet_ii_2_config.txt whinge
+Expected: Play script
+
+Tests behavior when given a nonexistent config file
+
+    cargo run -- hhh.txt whinge
+Expected: File not found message, error
+
+## Testing the Configuration file
+
+    cd text/hamlet_config
+
+Tests program's ability to handle blank lines in a config file.
+
+    cargo run -- hamlet_spaces.txt whinge
+Expected: Play script
+
+Tests program's behavior when given config file where a part does not have a part file specified
+
+    cargo run -- hamlet_missing_file.txt whinge
+Expected: Warning about line King not having two tokens, Play script without king
+
+Tests program's behavior when given extra input on a part line
+Ex, `King King.txt King2.txt` instead of `King King.txt`
+
+    cargo run -- hamlet_extra_file.txt 
+Expected: Play script 
+
+Tests program's ability to report when it is given extra input on a part line
+
+    cargo run -- hamlet_extra_file.txt whinge
+Expected: Warning about line King not having two tokens, Play script 
+
+
+Tests program's behavior when config file references nonexistent file 
+
+    cargo run -- hamlet_incorrect_file.txt
+Expected: File not found message, error
+
+Tests program's behavior when encountering empty config file
+
+    cargo run -- hamlet_blank.txt
+Expected: Config file does not contain parts message, error
+
+## Testing the part files
+    cd text/hamlet_lines
+
+Tests program's ability to handle blank lines in part file
+
+    cargo run -- hamlet_spaces.txt whinge
+Expected: Play script
+
+Tests program's ability to handle out of order lines in part file
+
+    cargo run -- hamlet_outoforder.txt
+Expected: Play script
+
+Tests program's ability to handle lines without numbers
+
+    cargo run -- hamlet_nonumbers.txt
+Expected: Play script, queen has no lines
+
+Tests program's ability to report lines having no numbers
+
+    cargo run -- hamlet_nonumbers.txt whinge
+Expected: Many messages about not being able to parse words as integers, Play script, queen has no lines
+
+Tests program's ability to handle part files which consist of only line numbers
+
+    cargo run -- hamlet_nolines.txt
+Expected: Play script, Rosencrantz has no lines
+
+Tests program's ability to report lines consisting of only line numbers
+
+    cargo run -- hamlet_nolines.txt whinge
+Expected: Messages about lines being malformed, Play script, Rosencrantz has no lines

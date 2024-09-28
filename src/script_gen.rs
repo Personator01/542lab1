@@ -100,6 +100,7 @@ fn read_config(filename: &String, play_name: &mut String, config: &mut PlayConfi
     let mut lines: Vec<String> = Vec::new();
     grab_trimmed_file_lines(filename, &mut lines)?;
     if lines.len() < 2 {
+        println!("Config file {} does not contain any parts", filename);
         return Err(ERR_SCRIPT);
     } else {
         *play_name = lines[PLAY_TITLE_IDX].clone();
