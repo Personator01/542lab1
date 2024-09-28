@@ -12,6 +12,11 @@ I ran into a few bugs after writing the majority of the code. One was that one o
 Another bug I ran into was that `grab_trimmed_file_lines` would, instead of returning the lines in a file sequentially like this: [1, 2, 3, 4, 5], would return each line along with the ones that came before it, like this: [1, 1 2, 1 2 3, 1 2 3 4, 1 2 3 4 5]. This was because I did not clear the buffer that held each line in between reading lines.
 
 # Running The Program
+## Send to linux lab
+    rsync lab1.tar.gz username@shell.cec.wustl.edu:lab1.tar.gz
+    ssh username@shell.cec.wustl.edu
+    qlogin
+
 ## Extracting and running the project:
     tar -xzf lab1.tar.gz
     cd 542lab1
@@ -114,6 +119,11 @@ Tests program's ability to report lines having no numbers
 
     cargo run -- hamlet_nonumbers.txt whinge
 Expected: Many messages about not being able to parse words as integers, Play script, queen has no lines
+
+Tests program's ability to handle parts with malformed line numbers
+    
+    cargo run -- hamlet_brokennumbers.txt whinge
+Expected: Single message about not being able to parse value "1aaa" as an int, Play script, first line missing
 
 Tests program's ability to handle part files which consist of only line numbers
 
