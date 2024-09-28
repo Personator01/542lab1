@@ -28,22 +28,32 @@ fn add_script_line(play: &mut Play, line: &String, speaker: &String) {
     if let Some((lineno, line_rest)) = line.split_once(char::is_whitespace) {
         let lineno = lineno.trim();
         match lineno.parse::<usize>() {
-            Ok(lineno) => play.push((lineno, speaker.clone(), line_rest.to_string())), 
+            Ok(lineno) => {
+                let line_rest_trim = line_rest.trim();
+                if !line_rest.is_empty() {
+                    play.push((lineno, speaker.clone(), line_rest_trim.to_string()));
+                }
+            }, 
             Err(_) => {
                 if DO_WARN.load(Ordering::SeqCst) {
                     println!("Could not parse token {} as integer (usize)", lineno);
                 }
             }
         }
+    } else {
+        if DO_WARN.load(Ordering::SeqCst) {
+            println!("Line is malformed: \"{}\" could not be split into line number and line", line);
+        }
     }
 }
 
 /// Gets lines from the given file and stores them in the given vec
+/// Will not store blank lines.
 fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Result<(), u8> {
     let file = match File::open(filename) {
         Ok(f) => f,
         Err(m) => { 
-            println!("Failed to open file {}, {:?}", filename, m);
+            println!("Failed to open file \"{}\", {:?}", filename, m);
             return Err(ERR_SCRIPT);
         }
     };
@@ -53,8 +63,14 @@ fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Result
         match reader.read_line(&mut line) {
             Err(e) => { println!("Error reading from file {}, {:?}", filename, e); return Err(ERR_SCRIPT); },
             Ok(0) => return Ok(()),
-            Ok(_) => {lines.push(line.trim().to_string())} 
+            Ok(_) => {
+                let line_trim = line.trim();
+                if !line_trim.is_empty() {
+                    lines.push(line_trim.to_string());
+                }
+            } 
         }
+        line.clear();
     }
 }
 
@@ -93,10 +109,11 @@ fn read_config(filename: &String, play_name: &mut String, config: &mut PlayConfi
 }
 
 /// Generates a script from the given configuration file
-fn script_gen(play: &mut Play, conf_file: &String) -> Result<(), u8> {
+fn script_gen(conf_file: &String, play: &mut Play, title: &mut String) -> Result<(), u8> {
     let mut config: PlayConfig = Vec::new();
     let mut play_name = String::new();
     read_config(conf_file, &mut play_name, &mut config)?;
     process_config(play, &config)?;
+    *title = play_name.clone();
     return Ok(());
 }

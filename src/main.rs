@@ -19,7 +19,7 @@ fn main() -> Result<(), u8>{
     let mut title = String::new();
     let mut play: Play = Vec::new();
 
-    script_gen(&mut play, &mut title)?;
+    script_gen(&conf_file, &mut play, &mut title)?;
 
     play.sort();
     recite(&title, &play);
@@ -59,10 +59,10 @@ fn parse_args(config_name: &mut String) -> Result<(), u8> {
 fn recite(title: &String, play: &Play) {
     let mut last_speaker = "";
     println!("{}", title);
-    for (lineno, speaker_name, line) in play {
+    for (_lineno, speaker_name, line) in play {
         if speaker_name != last_speaker {
             last_speaker = speaker_name;
-            println!("{}.", speaker_name);
+            println!("\n{}.", speaker_name);
         }
         println!("{}", line);
     }
