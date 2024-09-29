@@ -79,7 +79,7 @@ fn process_config(play: &mut Play, config: &PlayConfig) -> Result<(), u8> {
     for (part_name, part_file) in config {
         let mut lines: Vec<String> = Vec::new();
         grab_trimmed_file_lines(part_file, &mut lines)?;
-        lines.iter().for_each(|line| add_script_line(play, line, part_name));
+        lines.iter().for_each(|line| add_script_line(play, line, part_name)); // Adds all lines 
     }
     return Ok(());
 }
